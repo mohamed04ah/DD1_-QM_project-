@@ -9,28 +9,43 @@ bool bool_function::validate(string x) {
     bool has_consecutive = false;
     char prev = '\0';
 
-    for (char c : x) 
-    {
+    int var_count = 0;
+    while (i < x.size()) {
+        char c = x[i];
         if (isalpha(c)) {
-            if (prev == c) {  // Check if there are consecutive duplicate variables
+            if (prev == c) {
                 has_consecutive = true;
-                //return false;
             }
-            vars.insert(c);  // Add variable to set
-        } else if (c != '+' && c != '`') {  // Check if input contains only valid characters
+            vars.insert(c);
+            var_count++;
+        }
+        else if (c == '`') {
+            i++;
+            char next_c = x[i];
+            if (isalpha(next_c)) {
+                vars.insert(next_c);
+                var_count++;
+            }
+            else {
+                cout << "Error: Invalid character '" << next_c << "' found after backtick." << endl;
+                return false;
+            }
+        }
+        else if (c != '+') {
             cout << "Error: Invalid character '" << c << "' found in input." << endl;
             return false;
         }
         prev = c;
+        i++;
     }
 
-    if (has_consecutive) {  // Print an error message for consecutive duplicate variables
+    if (has_consecutive) {
         cout << "Error: Consecutive duplicate variables found in input." << endl;
         return false;
     }
 
-    // If we reach this point, the input string is valid
     cout << "The input string is valid." << endl;
+    cout << "Number of variables: " << var_count << endl;
     return true;
 }
 
