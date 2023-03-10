@@ -15,7 +15,7 @@ private:
 	int rows=0, size=0; // used to set size of the truth table and print it. 
 
 	
-	void validate(); // validate the entered function 
+	bool validate(string expression); // validate the entered function 
 	void gen_table(); // to generate the truth table. (output will be stored in a 2d vector)
 	void print_table(); // to print the truth table
 	void canonical_pos(); // extract pos form from turth table
