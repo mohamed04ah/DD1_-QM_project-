@@ -22,19 +22,7 @@ void bool_function::gen_table()
 		}
 	}
 
-	for (int i = 0; i < size; i++) 
-	{
-		cout << literals[i] << setw(3);
-	}
-	cout << endl;
-	for (int i = 0; i < rows; i++) 
-	{
-		for (int j = 0; j < size; j++) 
-		{
-			cout << temp_table[i][j] << setw(3);
-		}
-		cout << endl;
-	}
+	
 	truth_table = temp_table;
 }
 
@@ -42,9 +30,14 @@ void bool_function::print_table()
 {
 	for (int i = 0; i < size; i++)
 	{
-		for (int j = 0; j < rows; j++)
+		cout << literals[i] << setw(3);
+	}
+	cout << endl;
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < size; j++)
 		{
-			cout << truth_table[i][j] << " ";
+			cout << truth_table[i][j] << setw(3);
 		}
 		cout << endl;
 	}
