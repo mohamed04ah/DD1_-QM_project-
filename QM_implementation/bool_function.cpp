@@ -1,62 +1,79 @@
 #include "bool_function.h"
 
 bool_function::bool_function() {
-	if (validate()) {
-		gen_table();
-		output_table();
-		print_table();
+
+	bool res;
+	res=validate();
+	while (res!= true) 
+	{
+		cout << "try again" << endl;
+		literals.clear();
+		lit.clear();
+		res=validate();
 	}
-	else
-		cout << "Error!" << endl;
+	cout << "valid function entered" << endl;
+	gen_table();
+	output_table();
+    print_table();
 }
-bool bool_function::validate() {
+bool bool_function::validate() 
+{
 	bool flat = false;
-	while (!flat) {
-		getline(cin, expression);
-		for (int i = 0; i < expression.size(); i++) {
-			if (isalpha(expression[i])) {
-				lit[expression[i]] = 0;
-				flat = true;
-				literals.push_back(expression[i]);
-			}
-			else if (expression[i] == '+' && (i == 0 || i == expression.size() - 1 || expression[i - 1] == '+')) { //if '+' at the beginning or at the end or not between two literals
-				cout << "error!" << endl << "try again" << endl;
-				flat = false;
-				break;
-			}
-			else if (expression[i] == '`' && i == 0) { //'if '`' at the beginning
-				cout << "error!" << endl << "try again" << endl;
-				flat = false;
-				break;
-			}
-			else if (expression[i] == '`' && expression[i - 1] == '+' && i != 0) //--i is the major reason for the infinte loop, it decreases the i
-			{   //check if the +` come together in this way
-				cout << "Error: Invalid character '" << expression[i] << "' found in input." << endl;
-				cout << "try again" << endl;
-				flat = false;
-				break;
-			}
-			else if (expression[i] != '+' && expression[i] != '`' && !isalpha(expression[i])) //check if any other useless operator or number were put
+	string input;
+	cout << "enter your function" << endl;
+		getline(cin, input);
+		for (int i = 0; i < input.size(); i++)
+		{
+			if (isalpha(input[i])) 
 			{
-				cout << "Error: Invalid character '" << expression[i] << "' found in input." << endl;
-				cout << "try again" << endl;
+				lit[input[i]] = 0;
+				flat = true;
+				literals.push_back(input[i]);
+			}
+			else if (input[i] == '+' && (i == 0 || i == input.size() - 1 || input[i - 1] == '+')) { //if '+' at the beginning or at the end or not between two literals
+				//cout << "error!" << endl << "try again" << endl;
+				flat = false;
+				break;
+			}
+			else if (input[i] == '`' && i == 0) { //'if '`' at the beginning
+			//	cout << "error!" << endl << "try again" << endl;
+				flat = false;
+				break;
+			}
+			else if (input[i] == '`' && input[i - 1] == '+' && i != 0) //--i is the major reason for the infinte loop, it decreases the i
+			{   //check if the +` come together in this way
+				cout << "Error: Invalid character '" << input[i] << "' found in input." << endl;
+				//cout << "try again" << endl;
+				flat = false;
+				break;
+			}
+			else if (input[i] != '+' && input[i] != '`' && !isalpha(input[i])) //check if any other useless operator or number were put
+			{
+				cout << "Error: Invalid character '" << input[i] << "' found in input." << endl;
+			//	cout << "try again" << endl;
 				flat = false;
 				break;
 			}
 			else
 				flat = true;
 		}
-	}
+	
+		if (flat == false) {
+			return flat;
+		}
+
 	int count = 0;
 	for (auto it = lit.begin(); it != lit.end(); it++) {
 		it->second = count++;  //this is to give every literal a number as it will appear in the truth table
 	}
+
+	expression = input;
 	return flat;
 }
 void bool_function::gen_table()
 {
-	int size = literals.size();
-	int rows = pow(2, size);
+	 size = literals.size();
+	 rows = pow(2, size);
 	vector<vector<bool>> temp_table(rows, vector<bool>(size+1));
 
 	for (int i = 0; i < size; i++)  // for each column of the table
