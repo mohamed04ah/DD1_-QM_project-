@@ -1,55 +1,58 @@
-#include <set>
 #include "bool_function.h"
 
-bool bool_function::validate(string x) {
-    int i = 0;
-    vector<bool> User_given_function;
-
-    set<char> vars;  // Set to keep track of input variables
-
-    bool has_consecutive = false;
-    char prev = '\0';
-
-    int var_count = 0;
-    while (i < x.size()) {
-        char c = x[i];
-        if (isalpha(c)) {
-            if (prev == c) {
-                has_consecutive = true;
-            }
-            vars.insert(c);
-            var_count++;
-        }
-        else if (c == '`') {
-            i++;
-            char next_c = x[i];
-            if (isalpha(next_c)) {
-                vars.insert(next_c);
-                var_count++;
-            }
-            else {
-                cout << "Error: Invalid character '" << next_c << "' found after backtick." << endl;
-                return false;
-            }
-        }
-        else if (c != '+') {
-            cout << "Error: Invalid character '" << c << "' found in input." << endl;
-            return false;
-        }
-        prev = c;
-        i++;
-    }
-
-    if (has_consecutive) {
-        cout << "Error: Consecutive duplicate variables found in input." << endl;
-        return false;
-    }
-
-    cout << "The input string is valid." << endl;
-    cout << "Number of variables: " << var_count << endl;
-    return true;
+bool_function::bool_function() {
+	if (validate()) {
+		gen_table();
+		output_table();
+		print_table();
+	}
+	else
+		cout << "Error!" << endl;
 }
-
+bool bool_function::validate() {
+	bool flat = false;
+	while (!flat) {
+		getline(cin, expression);
+		for (int i = 0; i < expression.size(); i++) {
+			if (isalpha(expression[i])) {
+				lit[expression[i]] = 0;
+				flat = true;
+				literals.push_back(expression[i]);
+			}
+			else if (expression[i] == '+' && (i == 0 || i == expression.size() - 1 || expression[i - 1] == '+')) { //if '+' at the beginning or at the end or not between two literals
+				cout << "error!" << endl << "try again" << endl;
+				flat = false;
+				break;
+			}
+			else if (expression[i] == '`' && i == 0) { //'if '`' at the beginning
+				cout << "error!" << endl << "try again" << endl;
+				flat = false;
+				break;
+			}
+			else if (expression[i] == '`' && expression[i - 1] == '+' && i != 0) //--i is the major reason for the infinte loop, it decreases the i
+			{   //check if the +` come together in this way
+				cout << "Error: Invalid character '" << expression[i] << "' found in input." << endl;
+				cout << "try again" << endl;
+				flat = false;
+				break;
+			}
+			else if (expression[i] != '+' && expression[i] != '`' && !isalpha(expression[i])) //check if any other useless operator or number were put
+			{
+				cout << "Error: Invalid character '" << expression[i] << "' found in input." << endl;
+				cout << "try again" << endl;
+				flat = false;
+				break;
+			}
+			else
+				flat = true;
+		}
+	}
+	int count = 0;
+	for (auto it = lit.begin(); it != lit.end(); it++) {
+		it->second = count++;  //this is to give every literal a number as it will appear in the truth table
+	}
+	return flat;
+}
 void bool_function::gen_table()
 {
 	int size = literals.size();
@@ -72,9 +75,42 @@ void bool_function::gen_table()
 		}
 	}
 
-	
 	truth_table = temp_table;
 }
+
+void bool_function::output_table() {
+	vector<bool> real_output; //contain the final output of the function
+	for (int i = 0; i < truth_table.size(); i++) { //looping over every row in the table
+		vector<bool> storing;  //will store the multiplies (like ab,cd)
+		bool result = true;
+		for (int j = 0; j < expression.size(); j++) { //looping over the expression (like ab+cd)
+			char c = expression[j];
+			if (j == expression.size() - 1) {
+				if (c != '`')
+					result = result * truth_table[i][lit[c]];
+				break;
+			}
+			if (c != '+' && expression[j + 1] != '`' && j != expression.size() - 1)//take care because there might be spaces between the characters in the expression 
+				result = result * truth_table[i][lit[c]];   //lit[c] this represents which colomn in the row i
+			else if (c != '+' && expression[j + 1] == '`' && j != expression.size() - 1) {
+				result = result * !truth_table[i][lit[c]];
+			}
+			else if (c == '+') {
+				storing.push_back(result);
+				result = true;
+			}
+		}
+		storing.push_back(result); //because the final result will not be pushed back as there is no + at the end of the expression
+		bool sum = false; //this will add the multiplies in the storing vector
+		for (int i = 0; i < storing.size(); i++) {
+			sum = sum + storing[i];
+		}
+		real_output.push_back(sum);
+	}
+	for (int i = 0; i < real_output.size(); i++)
+		cout << real_output[i] << endl;
+}
+
 
 void bool_function::print_table()
 {
@@ -132,5 +168,6 @@ void bool_function::canonical_pos() {// take the output of the function, the tab
 	}
 	cout << "The Canonical Product of Sums: " << pos_result << endl;
 }
+
 
 
