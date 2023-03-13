@@ -15,6 +15,7 @@ bool_function::bool_function() {
 	gen_table();
 	output_table();
     print_table();
+	
 }
 bool bool_function::validate() 
 {
@@ -72,10 +73,9 @@ bool bool_function::validate()
 }
 void bool_function::gen_table()
 {
-	 size = literals.size();
+	 size = literals.size();  // contains number of columns without output
 	 rows = pow(2, size);
 	vector<vector<bool>> temp_table(rows, vector<bool>(size+1));
-
 	for (int i = 0; i < size; i++)  // for each column of the table
 	{
 		int flip = pow(2, size - (i + 1)); // sequence of TRUE AND FALSE
@@ -124,8 +124,8 @@ void bool_function::output_table() {
 		}
 		real_output.push_back(sum);
 	}
-	for (int i = 0; i < real_output.size(); i++)
-		cout << real_output[i] << endl;
+	for (int i = 0; i < rows; i++)
+		truth_table[i][size] = real_output[i];    // adds this output to the truth table. 
 }
 
 
@@ -133,14 +133,19 @@ void bool_function::print_table()
 {
 	for (int i = 0; i < size; i++)
 	{
-		cout << literals[i] << setw(3);
+		cout << setw(3)<<literals[i] << setw(3);
+	}
+	cout << "F";
+	cout << endl;
+	for (int i = 0; i < size; i++) {
+		cout << "------";
 	}
 	cout << endl;
 	for (int i = 0; i < rows; i++)
 	{
-		for (int j = 0; j < size; j++)
+		for (int j = 0; j < size+1; j++)
 		{
-			cout << truth_table[i][j] << setw(3);
+			cout <<setw(3)<< truth_table[i][j] << setw(3);
 		}
 		cout << endl;
 	}
