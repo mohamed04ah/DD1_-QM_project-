@@ -15,14 +15,15 @@ bool_function::bool_function() {
 	gen_table();
 	output_table();
     print_table();
-	
+	canonical_sop();
+	canonical_pos();
 }
 bool bool_function::validate() 
 {
 	bool flat = false;
 	string input;
 	cout << "enter your function" << endl;
-		getline(cin, input);
+	getline(cin, input);
 		for (int i = 0; i < input.size(); i++)
 		{
 			if (isalpha(input[i])) 
@@ -153,17 +154,17 @@ void bool_function::print_table()
 
 void bool_function::canonical_sop() {// take the output of the function, the table of a,b,..., the literals
 	string sop_result = "";
-	for (int i = 0; i < truth_table.size(); i++) {
-		if (truth_table[i][truth_table[0].size()-1] == true) { //if the output of the function equal one(which is in the last colomn)
-			for (int j = 0; j < truth_table[0].size(); j++) { //will loop over the colomns (literals) and will see the value of each literal
+	for (int i = 0; i < rows; i++) {
+		if (truth_table[i][size] == true) { //if the output of the function equal one(which is in the last colomn)
+			for (int j = 0; j < size; j++) { //will loop over the colomns (literals) and will see the value of each literal
 				if (truth_table[i][j] == false) { //if it is equal zero then we put ' for representing (Not) in literals
 					sop_result += literals[j];
-					sop_result += "'";
+					sop_result += "`";
 				}
 				else  //otherwise we only add the literal to the expression
 					sop_result += literals[j];
 			}
-			sop_result += "+";//this adddition is added between the products 
+			sop_result += "+";//this adddition is added between the products
 		}
 	}
 	sop_result.pop_back(); //becasue there will be (+) added at the end of the expression so we remove it
@@ -172,13 +173,13 @@ void bool_function::canonical_sop() {// take the output of the function, the tab
 
 void bool_function::canonical_pos() {// take the output of the function, the table of a,b,.., the literals
 	string pos_result = "";
-	for (int i = 0; i < truth_table.size(); i++) {
-		if (truth_table[i][truth_table[0].size() - 1] == false) { //if the output of the function equal zero
+	for (int i = 0; i < rows; i++) {
+		if (truth_table[i][size] == false) { //if the output of the function equal zero
 			pos_result += "(";   //put every n literals added between prackets
-			for (int j = 0; j < truth_table[0].size(); j++) { //will loop over the colomns (literals) and will see the value of each literal
+			for (int j = 0; j < size; j++) { //will loop over the colomns (literals) and will see the value of each literal
 				if (truth_table[i][j] == true) { //if it is equal one then we put ' for representing (Not) in literals
 					pos_result += literals[j];
-					pos_result += "'";
+					pos_result += "`";
 				}
 				else //otherwise we only add the literal to the expression
 					pos_result += literals[j];

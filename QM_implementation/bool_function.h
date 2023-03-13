@@ -14,7 +14,7 @@ private:
 	vector<char> literals; // to store function literals after validation. (will be used later) 
 	vector<vector<bool>> truth_table; 
 	map<char, int> lit; //literals with their index in truth table
-	int rows=0, size=0; // used to set size of the truth table and print it. 
+	int rows=0, size=0; // used to set size of the truth table and print it.  //size here is equal to the size of the colomns of truth table -1
 
 	
 	bool validate(); // validate the entered function 
