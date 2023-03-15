@@ -31,7 +31,7 @@ bool bool_function::validate()
 			{
 				lit[input[i]] = 0;
 				flat = true;
-				literals.push_back(input[i]);
+				//literals.push_back(input[i]);
 			}
 			else if (input[i] == '+' && (i == 0 || i == input.size() - 1 || input[i - 1] == '+')) { //if '+' at the beginning or at the end or not between two literals
 				//cout << "error!" << endl << "try again" << endl;
@@ -70,6 +70,10 @@ bool bool_function::validate()
 		it->second = count++;  //this is to give every literal a number as it will appear in the truth table
 	}
 
+	for (auto it = lit.begin(); it != lit.end(); it++) 
+	{
+		literals.push_back(it->first);
+	}
 	expression = input;
 	return flat;
 }
