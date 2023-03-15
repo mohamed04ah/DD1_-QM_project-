@@ -5,11 +5,23 @@
 #include<map>
 #include<iomanip>
 using namespace std;
+struct  ret_type    // this returns if the difference is 1 or not;
+{
+
+	bool diff = false;
+	string comb;
+	vector<int> minterm_comb;// the combination of the minterms of the binaries after grouping 
+	int num_of_1=0;
+
+};
 class bool_function
 {
 public: 
 	bool_function();//string input); // will take in the boolean function entered
 private: 
+	
+	map<string, vector<int>> binary_rep_mins; // key is the binary rep and the value is the minterm 
+	
 	string expression;  // to store the function expression as a whole after validation 
 	vector<char> literals; // to store function literals after validation. (will be used later) 
 	vector<vector<bool>> truth_table; 
@@ -25,6 +37,8 @@ private:
 	void canonical_sop(); // extract sop form from truth table 
 	void P_I();   // identify prime implicants 
 	void EPI(); // identify essential prime implicants
+	ret_type compare_strings(string x, string y);  // x and y are the binary rep of the mins
+	
 
 };
 

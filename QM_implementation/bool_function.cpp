@@ -15,6 +15,7 @@ bool_function::bool_function() {
 	gen_table();
 	output_table();
     print_table();
+	P_I();
 	canonical_sop();
 	canonical_pos();
 }
@@ -144,6 +145,7 @@ void bool_function::print_table()
 	cout << endl;
 	for (int i = 0; i < rows; i++)
 	{
+		cout << i << " : ";
 		for (int j = 0; j < size+1; j++)
 		{
 			cout <<setw(3)<< truth_table[i][j] << setw(3);
@@ -173,151 +175,146 @@ void bool_function::canonical_sop() {// take the output of the function, the tab
 
 void bool_function::P_I()
 {
-	map<int, vector<string>> implication_table;
-	int i, j;
+	map<int, vector<string>> implication_table; // keys are number of 1s, value is the binary rep 
+	vector<string>primes;
 	int counter = 0;
-	for ( i = 0; i < rows; i++)
+	for (int i = 0; i < rows; i++)
 	{
-		string temp_string="";
-		for ( j = 0; j < size; j++)
-		{
-			if (truth_table[i][j] == 1)
-			{
-				temp_string += "1";
-				counter++;
-			}
-			else 
-			{
-				temp_string += "0";
-			}
 
-			
-		}
-		if (implication_table.find(counter) == implication_table.end())
+		string temp_string = "";
+		if (truth_table[i][size] == 1)
 		{
-			vector<string> temp;
-			temp.push_back(temp_string);
-			implication_table.insert(pair<int, vector<string>>(counter, temp));
+			for (int j = 0; j < size; j++)
+			{
+
+				if (truth_table[i][j] == 1)
+				{
+					temp_string += "1";
+					counter++;
+				}
+				else
+				{
+					temp_string += "0";
+				}
+
+
+
+			}
+			if (implication_table.find(counter) == implication_table.end())
+			{
+				vector<string> temp;
+				temp.push_back(temp_string);
+				implication_table.insert(pair<int, vector<string>>(counter, temp));
+			}
+			else {
+				implication_table[counter].push_back(temp_string);
+			}
+			binary_rep_mins[temp_string].push_back(i);
 		}
-		else {
-			implication_table[counter].push_back(temp_string);
-		}
+
 		counter = 0;
 		temp_string.clear();
 	}
 
-	for (map<int, vector<string>> ::iterator it=implication_table.begin();it!=implication_table.end();it++)
+	/*for (map<int, vector<string>> ::iterator it = implication_table.begin(); it != implication_table.end(); it++)
 	{
-		cout << (*it).first <<":";
+		cout << (*it).first << ":";
 		vector<string>temp = ((*it).second);
-		for (int j=0;j<temp.size();j++) 
+		for (int j = 0; j < temp.size(); j++)
 		{
 			cout << temp[j] << " ,";
 		}
 		cout << endl;
-	}
+	}*/
 
-	// the groups are now formed. 
-	int counter_2 = 0;
-	for (map<int, vector<string>> ::iterator it = implication_table.begin(); it != implication_table.end(); it++) 
+	cout << "====================================================" << endl;
+	map<int, vector<string>> map_temp;
+	while (!implication_table.empty())
 	{
-		
-		vector <string> temp = (*it).second;
-		vector <string> temp_1 = (*it++).second;
+		map_temp = implication_table;
+		implication_table.clear();
+		for (map<int, vector<string>> ::iterator it = map_temp.begin(); it != map_temp.end(); it++)
+		{
+			if (it == --map_temp.end())
+				break;
 
-		for (int i = 0; i < temp.size(); i++)
-		{ 
-			for (int j = 0; j < temp_1.size(); j++)
+			vector <string> temp = (*it).second;
+
+			map<int, vector<string>> ::iterator it2;
+			it2 = ++it;
+			vector <string> temp_1 = (*it2).second;
+			it--;
+
+
+			for (int i = 0; i < temp.size(); i++)
 			{
-				for (int k = 0; k < temp[i].size(); k++) 
+				int test = 0;
+				for (int j = 0; j < temp_1.size(); j++)
 				{
-					for (int z = 0; z < temp_1[j].size(); z++)
+					ret_type result;
+					result = compare_strings(temp[i], temp_1[j]);
+
+					if (result.diff)
 					{
-						if (temp[k] != temp_1[z])
-							counter_2++;
+						test = 1;
+
+						binary_rep_mins[result.comb] = result.minterm_comb;
+						implication_table[result.num_of_1].push_back(result.comb);
 					}
+
 				}
-				if (counter_2 ==1)
+				if (test == 0)
 				{
-					
+					primes.push_back(temp[i]);
 				}
+
 			}
+
+
 		}
+
+		/*for (auto it = map_temp.begin(); it != map_temp.end(); it++)
+		{
+			cout << it->first << " " << ":";
+			for (auto x : it->second)
+				cout << x << " " << ",";
+			cout << endl;
+		}*/
+
 	}
 
-}
-
-	int counter = 0;
-	for ( i = 0; i < rows; i++)
+	map<string, vector<int>> final_PI;
+	for (auto it = map_temp.begin(); it != map_temp.end(); it++)
 	{
-		string temp_string="";
-		for ( j = 0; j < size; j++)
+		for (auto x : it->second)
 		{
-			if (truth_table[i][j] == 1)
-			{
-				temp_string += "1";
-				counter++;
-			}
-			else 
-			{
-				temp_string += "0";
-			}
+			final_PI[x] = binary_rep_mins[x];
 
-			
 		}
-		if (implication_table.find(counter) == implication_table.end())
-		{
-			vector<string> temp;
-			temp.push_back(temp_string);
-			implication_table.insert(pair<int, vector<string>>(counter, temp));
-		}
-		else {
-			implication_table[counter].push_back(temp_string);
-		}
-		counter = 0;
-		temp_string.clear();
+
 	}
 
-	for (map<int, vector<string>> ::iterator it=implication_table.begin();it!=implication_table.end();it++)
+	for (int i = 0; i < primes.size(); i++)
 	{
-		cout << (*it).first <<":";
-		vector<string>temp = ((*it).second);
-		for (int j=0;j<temp.size();j++) 
-		{
-			cout << temp[j] << " ,";
-		}
+		final_PI[primes[i]] = binary_rep_mins[primes[i]];
+	}
+
+	for (auto it = final_PI.begin(); it != final_PI.end(); it++)
+	{
+		cout << it->first << " " << ":";
+		for (auto x : it->second)
+			cout << x << " " << ",";
 		cout << endl;
 	}
+	binary_rep_mins = final_PI;
 
-	// the groups are now formed. 
-	int counter_2 = 0;
-	for (map<int, vector<string>> ::iterator it = implication_table.begin(); it != implication_table.end(); it++) 
-	{
-		
-		vector <string> temp = (*it).second;
-		vector <string> temp_1 = (*it++).second;
 
-		for (int i = 0; i < temp.size(); i++)
-		{ 
-			for (int j = 0; j < temp_1.size(); j++)
-			{
-				for (int k = 0; k < temp[i].size(); k++) 
-				{
-					for (int z = 0; z < temp_1[j].size(); z++)
-					{
-						if (temp[k] != temp_1[z])
-							counter_2++;
-					}
-				}
-				if (counter_2 ==1)
-				{
-					
-				}
-			}
-		}
-	}
 
 }
+
+	
+
+
 
 void bool_function::canonical_pos() {// take the output of the function, the table of a,b,.., the literals
 	string pos_result = "";
@@ -341,4 +338,55 @@ void bool_function::canonical_pos() {// take the output of the function, the tab
 }
 
 
+ret_type bool_function::compare_strings(string x, string y)
+{
 
+	int counter = 0;
+
+	ret_type value;
+	value.num_of_1 = 0;
+	string temp;
+	int pos = -1;
+	for (int i = 0; i < x.size(); i++)
+	{
+		if (x[i] != y[i])
+		{
+			counter++;
+			pos = i;
+		}
+		if (counter > 1)
+		{
+			value.diff = false;
+			return value;
+		}
+	}
+	if (counter == 1)
+	{
+		temp = x;
+		temp[pos] = '-';
+		value.comb = temp;
+		value.diff = true;
+
+	}
+
+	for (auto it : binary_rep_mins[x])
+	{
+
+		value.minterm_comb.push_back(it);
+	}
+
+	for (auto it : binary_rep_mins[y]) {
+
+		value.minterm_comb.push_back(it);
+	}
+
+	for (int i = 0; i < temp.size(); i++)
+	{
+		if (temp[i] == '1')
+			value.num_of_1++;
+	}
+
+	return value;
+
+
+}
