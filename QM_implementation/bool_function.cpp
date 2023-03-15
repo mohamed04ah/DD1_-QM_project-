@@ -171,6 +171,154 @@ void bool_function::canonical_sop() {// take the output of the function, the tab
 	cout << "The Canonical Sum of Products: " << sop_result << endl;
 }
 
+void bool_function::P_I()
+{
+	map<int, vector<string>> implication_table;
+	int i, j;
+	int counter = 0;
+	for ( i = 0; i < rows; i++)
+	{
+		string temp_string="";
+		for ( j = 0; j < size; j++)
+		{
+			if (truth_table[i][j] == 1)
+			{
+				temp_string += "1";
+				counter++;
+			}
+			else 
+			{
+				temp_string += "0";
+			}
+
+			
+		}
+		if (implication_table.find(counter) == implication_table.end())
+		{
+			vector<string> temp;
+			temp.push_back(temp_string);
+			implication_table.insert(pair<int, vector<string>>(counter, temp));
+		}
+		else {
+			implication_table[counter].push_back(temp_string);
+		}
+		counter = 0;
+		temp_string.clear();
+	}
+
+	for (map<int, vector<string>> ::iterator it=implication_table.begin();it!=implication_table.end();it++)
+	{
+		cout << (*it).first <<":";
+		vector<string>temp = ((*it).second);
+		for (int j=0;j<temp.size();j++) 
+		{
+			cout << temp[j] << " ,";
+		}
+		cout << endl;
+	}
+
+	// the groups are now formed. 
+	int counter_2 = 0;
+	for (map<int, vector<string>> ::iterator it = implication_table.begin(); it != implication_table.end(); it++) 
+	{
+		
+		vector <string> temp = (*it).second;
+		vector <string> temp_1 = (*it++).second;
+
+		for (int i = 0; i < temp.size(); i++)
+		{ 
+			for (int j = 0; j < temp_1.size(); j++)
+			{
+				for (int k = 0; k < temp[i].size(); k++) 
+				{
+					for (int z = 0; z < temp_1[j].size(); z++)
+					{
+						if (temp[k] != temp_1[z])
+							counter_2++;
+					}
+				}
+				if (counter_2 ==1)
+				{
+					
+				}
+			}
+		}
+	}
+
+}
+
+	int counter = 0;
+	for ( i = 0; i < rows; i++)
+	{
+		string temp_string="";
+		for ( j = 0; j < size; j++)
+		{
+			if (truth_table[i][j] == 1)
+			{
+				temp_string += "1";
+				counter++;
+			}
+			else 
+			{
+				temp_string += "0";
+			}
+
+			
+		}
+		if (implication_table.find(counter) == implication_table.end())
+		{
+			vector<string> temp;
+			temp.push_back(temp_string);
+			implication_table.insert(pair<int, vector<string>>(counter, temp));
+		}
+		else {
+			implication_table[counter].push_back(temp_string);
+		}
+		counter = 0;
+		temp_string.clear();
+	}
+
+	for (map<int, vector<string>> ::iterator it=implication_table.begin();it!=implication_table.end();it++)
+	{
+		cout << (*it).first <<":";
+		vector<string>temp = ((*it).second);
+		for (int j=0;j<temp.size();j++) 
+		{
+			cout << temp[j] << " ,";
+		}
+		cout << endl;
+	}
+
+	// the groups are now formed. 
+	int counter_2 = 0;
+	for (map<int, vector<string>> ::iterator it = implication_table.begin(); it != implication_table.end(); it++) 
+	{
+		
+		vector <string> temp = (*it).second;
+		vector <string> temp_1 = (*it++).second;
+
+		for (int i = 0; i < temp.size(); i++)
+		{ 
+			for (int j = 0; j < temp_1.size(); j++)
+			{
+				for (int k = 0; k < temp[i].size(); k++) 
+				{
+					for (int z = 0; z < temp_1[j].size(); z++)
+					{
+						if (temp[k] != temp_1[z])
+							counter_2++;
+					}
+				}
+				if (counter_2 ==1)
+				{
+					
+				}
+			}
+		}
+	}
+
+}
+
 void bool_function::canonical_pos() {// take the output of the function, the table of a,b,.., the literals
 	string pos_result = "";
 	for (int i = 0; i < rows; i++) {
