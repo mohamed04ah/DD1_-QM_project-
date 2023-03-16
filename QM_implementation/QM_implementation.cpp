@@ -5,7 +5,6 @@ int main()
 {
 	bool_function expre;
 
-	
 
 }
 

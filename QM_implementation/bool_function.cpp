@@ -16,8 +16,8 @@ bool_function::bool_function() {
 	output_table();
     print_table();
 	P_I();
-	canonical_sop();
-	canonical_pos();
+	//canonical_sop();
+	//canonical_pos();
 	
 }
 bool bool_function::validate() 
@@ -107,23 +107,35 @@ void bool_function::output_table() {
 	for (int i = 0; i < truth_table.size(); i++) { //looping over every row in the table
 		vector<bool> storing;  //will store the multiplies (like ab,cd)
 		bool result = true;
-		for (int j = 0; j < expression.size(); j++) { //looping over the expression (like ab+cd)
+		for (int j = 0; j < expression.size(); j++)
+		{ //looping over the expression (like ab+cd)
 			char c = expression[j];
+			if (c == '`')
+				continue;
 			if (j == expression.size() - 1) {
-				if (c != '`')
-					result = result * truth_table[i][lit[c]];
+				result = result * truth_table[i][lit[c]];
 				break;
 			}
 			if (c != '+' && expression[j + 1] != '`' && j != expression.size() - 1)//take care because there might be spaces between the characters in the expression 
 				result = result * truth_table[i][lit[c]];   //lit[c] this represents which colomn in the row i
-			else if (c != '+' && expression[j + 1] == '`' && j != expression.size() - 1) {
-				result = result * !truth_table[i][lit[c]];
+			else if (c != '+' && expression[j + 1] == '`' && j != expression.size() - 1) 
+			{
+				result = result *!truth_table[i][lit[c]];
 			}
-			else if (c == '+') {
+			
+			else if (c == '+')
+			{
+				if (result == 1)
+				{
+					truth_table[i][size] = 1;
+					break;
+				}
+				else
 				storing.push_back(result);
 				result = true;
 			}
 		}
+		
 		storing.push_back(result); //because the final result will not be pushed back as there is no + at the end of the expression
 		bool sum = false; //this will add the multiplies in the storing vector
 		for (int i = 0; i < storing.size(); i++) {
@@ -131,6 +143,7 @@ void bool_function::output_table() {
 		}
 		real_output.push_back(sum);
 	}
+
 	for (int i = 0; i < rows; i++)
 		truth_table[i][size] = real_output[i];    // adds this output to the truth table. 
 }
@@ -208,9 +221,9 @@ void bool_function::P_I()
 			}
 			if (implication_table.find(counter) == implication_table.end())
 			{
-				vector<string> temp;
-				temp.push_back(temp_string);
-				implication_table.insert(pair<int, vector<string>>(counter, temp));
+				//vector<string> temp;
+				//temp.push_back(temp_string);
+				implication_table[counter].push_back( temp_string);
 			}
 			else {
 				implication_table[counter].push_back(temp_string);
@@ -229,117 +242,127 @@ void bool_function::P_I()
 		for (auto x : it->second)
 			cout << x << " ";
 		cout << endl;
-	}
-	*/
+	}*/
+	
 
 	cout << "====================================================" << endl;
 	map<int, vector<string>> map_temp;
+	map<string, bool> check_map;
 	while (!implication_table.empty())
 	{
+		
 		map_temp = implication_table;
 		implication_table.clear();
+		/*for (auto it = map_temp.begin(); it != map_temp.end(); it++)
+		{
+			cout << it->first << " ; ";
+			for (auto x : it->second)
+			{
+
+				cout << x << " ";
+			}
+			cout << endl;
+		}*/
+		
 		if (map_temp.size()==1)
 		{
-
-			for (auto y = map_temp.begin(); y != map_temp.end(); y++)
-				for (auto x : y->second)
-					primes.push_back(x);
-			
-			break;
-		}
-
-		
-		
-			for (map<int, vector<string>> ::iterator it = map_temp.begin(); it != map_temp.end(); it++)
+			for (auto it = map_temp.begin(); it != map_temp.end(); it++)
 			{
 				
-				if (it == --map_temp.end())
+				for (auto x : it->second)
 				{
-					vector <string> temp = (*it).second;
-					map<int, vector<string>> ::iterator it2;
-					it2 = --it;
-					vector <string> temp_1 = (*it2).second;
-					
-					for (int i = 0; i < temp.size(); i++)
-					{
-						int test = 0;
-						for (int j = 0; j < temp_1.size(); j++)
-						{
-							ret_type result;
-							result = compare_strings(temp_1[j], temp[i]);
-
-							if (result.diff)
-							{
-								test = 1;
-
-								binary_rep_mins[result.comb] = result.minterm_comb;
-								implication_table[result.num_of_1].push_back(result.comb);
-							}
-
-
-						}
-						if (test == 0)
-						{
-
-							primes.push_back(temp[i]);
-
-						}
-
-					}
-					break;
+				
+					check_map[x] = false;
 
 				}
+			}
+		}
 
-				vector <string> temp = (*it).second; // second group
+		else
+		{	
+			for (map<int, vector<string>> ::iterator it = map_temp.begin(); it != map_temp.end(); it++) 
+			{
 
-				map<int, vector<string>> ::iterator it2;
-				it2 = ++it;
-				vector <string> temp_1 = (*it2).second;  // first group 
-				it--;
+			  if (it == --map_temp.end())
+			  {
+				break;
+			  }
 
-				
-				
-					for (int i = 0; i < temp.size(); i++)
+			  vector <string> temp = (*it).second; // first group
+
+			  map<int, vector<string>> ::iterator it2;
+			  it2 = ++it;
+			  vector <string> temp_1 = (*it2).second;  // second group 
+			  --it;
+
+
+			 
+			  for (int i = 0; i < temp.size(); i++)
+			  {
+
+				for (int j = 0; j < temp_1.size(); j++)
+				{
+					ret_type result;
+					result = compare_strings(temp[i], temp_1[j]);
+
+					if (result.diff)
 					{
-						int test = 0;
-						for (int j = 0; j < temp_1.size(); j++)
-						{
-							ret_type result;
-							result = compare_strings(temp[i], temp_1[j]);
 
-							if (result.diff)
-							{
-								test = 1;
+						check_map[temp[i]] = true;
+						check_map[temp_1[j]] = true;
 
-								binary_rep_mins[result.comb] = result.minterm_comb;
-								implication_table[result.num_of_1].push_back(result.comb);
-							}
-
-
-						}
-						if (test == 0)
-						{
-
-							primes.push_back(temp[i]);
-
-						}
-
+						binary_rep_mins[result.comb] = result.minterm_comb;
+						implication_table[result.num_of_1].push_back(result.comb);
 					}
-				
+					else
+					{
+						if (check_map[temp[i]] != true)
+							check_map[temp[i]] = false;
+						if (check_map[temp_1[j]] != true)
+							check_map[temp_1[j]] = false;
+					}
+
+				}
+			   }
 
 
 
 			}
-		
 
+
+		}
+
+			
 		
+			
+		/*	for (auto it = check_map.begin(); it != check_map.end(); it++)
+			{
+				
+				if (it->second == false)
+				{
+					primes.push_back(it->first);
+				}
+
+				
+			}*/
+
+			//check_map.clear();
 
 	}
 	
-	
+		for (auto it = check_map.begin(); it != check_map.end(); it++)
+			{
+
+				if (it->second == false)
+				{
+					primes.push_back(it->first);
+				}
+
+
+			}
 
 	map<string, vector<int>> final_PI;
-	for (auto it = map_temp.begin(); it != map_temp.end(); it++)
+	/*for (auto it = map_temp.begin(); it != map_temp.end(); it++)
 	{
 		for (auto x : it->second)
 		{
@@ -347,8 +370,9 @@ void bool_function::P_I()
 
 		}
 
-	}
+	}*/
 
+	
 	for (int i = 0; i < primes.size(); i++)
 	{
 		final_PI[primes[i]] = binary_rep_mins[primes[i]];
