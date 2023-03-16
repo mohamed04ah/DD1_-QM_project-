@@ -18,6 +18,7 @@ bool_function::bool_function() {
 	P_I();
 	canonical_sop();
 	canonical_pos();
+	
 }
 bool bool_function::validate() 
 {
@@ -31,7 +32,7 @@ bool bool_function::validate()
 			{
 				lit[input[i]] = 0;
 				flat = true;
-				//literals.push_back(input[i]);
+			
 			}
 			else if (input[i] == '+' && (i == 0 || i == input.size() - 1 || input[i - 1] == '+')) { //if '+' at the beginning or at the end or not between two literals
 				//cout << "error!" << endl << "try again" << endl;
@@ -182,6 +183,7 @@ void bool_function::P_I()
 	map<int, vector<string>> implication_table; // keys are number of 1s, value is the binary rep 
 	vector<string>primes;
 	int counter = 0;
+	
 	for (int i = 0; i < rows; i++)
 	{
 
@@ -220,16 +222,15 @@ void bool_function::P_I()
 		temp_string.clear();
 	}
 
-	/*for (map<int, vector<string>> ::iterator it = implication_table.begin(); it != implication_table.end(); it++)
+	/*for (auto it = implication_table.begin(); it != implication_table.end(); it++)
 	{
-		cout << (*it).first << ":";
-		vector<string>temp = ((*it).second);
-		for (int j = 0; j < temp.size(); j++)
-		{
-			cout << temp[j] << " ,";
-		}
+		cout << it->first << " :";
+
+		for (auto x : it->second)
+			cout << x << " ";
 		cout << endl;
-	}*/
+	}
+	*/
 
 	cout << "====================================================" << endl;
 	map<int, vector<string>> map_temp;
@@ -237,55 +238,105 @@ void bool_function::P_I()
 	{
 		map_temp = implication_table;
 		implication_table.clear();
-		for (map<int, vector<string>> ::iterator it = map_temp.begin(); it != map_temp.end(); it++)
+		if (map_temp.size()==1)
 		{
-			if (it == --map_temp.end())
-				break;
 
-			vector <string> temp = (*it).second;
-
-			map<int, vector<string>> ::iterator it2;
-			it2 = ++it;
-			vector <string> temp_1 = (*it2).second;
-			it--;
-
-
-			for (int i = 0; i < temp.size(); i++)
-			{
-				int test = 0;
-				for (int j = 0; j < temp_1.size(); j++)
-				{
-					ret_type result;
-					result = compare_strings(temp[i], temp_1[j]);
-
-					if (result.diff)
-					{
-						test = 1;
-
-						binary_rep_mins[result.comb] = result.minterm_comb;
-						implication_table[result.num_of_1].push_back(result.comb);
-					}
-
-				}
-				if (test == 0)
-				{
-					primes.push_back(temp[i]);
-				}
-
-			}
-
-
+			for (auto y = map_temp.begin(); y != map_temp.end(); y++)
+				for (auto x : y->second)
+					primes.push_back(x);
+			
+			break;
 		}
 
-		/*for (auto it = map_temp.begin(); it != map_temp.end(); it++)
-		{
-			cout << it->first << " " << ":";
-			for (auto x : it->second)
-				cout << x << " " << ",";
-			cout << endl;
-		}*/
+		
+		
+			for (map<int, vector<string>> ::iterator it = map_temp.begin(); it != map_temp.end(); it++)
+			{
+				
+				if (it == --map_temp.end())
+				{
+					vector <string> temp = (*it).second;
+					map<int, vector<string>> ::iterator it2;
+					it2 = --it;
+					vector <string> temp_1 = (*it2).second;
+					
+					for (int i = 0; i < temp.size(); i++)
+					{
+						int test = 0;
+						for (int j = 0; j < temp_1.size(); j++)
+						{
+							ret_type result;
+							result = compare_strings(temp_1[j], temp[i]);
+
+							if (result.diff)
+							{
+								test = 1;
+
+								binary_rep_mins[result.comb] = result.minterm_comb;
+								implication_table[result.num_of_1].push_back(result.comb);
+							}
+
+
+						}
+						if (test == 0)
+						{
+
+							primes.push_back(temp[i]);
+
+						}
+
+					}
+					break;
+
+				}
+
+				vector <string> temp = (*it).second; // second group
+
+				map<int, vector<string>> ::iterator it2;
+				it2 = ++it;
+				vector <string> temp_1 = (*it2).second;  // first group 
+				it--;
+
+				
+				
+					for (int i = 0; i < temp.size(); i++)
+					{
+						int test = 0;
+						for (int j = 0; j < temp_1.size(); j++)
+						{
+							ret_type result;
+							result = compare_strings(temp[i], temp_1[j]);
+
+							if (result.diff)
+							{
+								test = 1;
+
+								binary_rep_mins[result.comb] = result.minterm_comb;
+								implication_table[result.num_of_1].push_back(result.comb);
+							}
+
+
+						}
+						if (test == 0)
+						{
+
+							primes.push_back(temp[i]);
+
+						}
+
+					}
+				
+
+
+
+			}
+		
+
+		
 
 	}
+	
+	
 
 	map<string, vector<int>> final_PI;
 	for (auto it = map_temp.begin(); it != map_temp.end(); it++)
@@ -317,7 +368,11 @@ void bool_function::P_I()
 }
 
 	
+void bool_function::EPI()
+{
 
+
+}
 
 
 void bool_function::canonical_pos() {// take the output of the function, the table of a,b,.., the literals
@@ -348,6 +403,7 @@ ret_type bool_function::compare_strings(string x, string y)
 	int counter = 0;
 
 	ret_type value;
+
 	value.num_of_1 = 0;
 	string temp;
 	int pos = -1;
@@ -390,6 +446,7 @@ ret_type bool_function::compare_strings(string x, string y)
 			value.num_of_1++;
 	}
 
+	
 	return value;
 
 

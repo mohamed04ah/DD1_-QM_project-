@@ -8,9 +8,9 @@ using namespace std;
 struct  ret_type    // this returns if the difference is 1 or not;
 {
 
-	bool diff = false;
-	string comb;
-	vector<int> minterm_comb;// the combination of the minterms of the binaries after grouping 
+	bool diff ;
+	string comb; //string nafso
+	vector<int> minterm_comb;// the combination of the minterms of the binaries after grouping  arkam el mins
 	int num_of_1=0;
 
 };
