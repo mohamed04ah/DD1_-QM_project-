@@ -335,7 +335,7 @@ void bool_function::P_I()
 			
 		
 			
-		/*	for (auto it = check_map.begin(); it != check_map.end(); it++)
+			for (auto it = check_map.begin(); it != check_map.end(); it++)
 			{
 				
 				if (it->second == false)
@@ -344,33 +344,16 @@ void bool_function::P_I()
 				}
 
 				
-			}*/
+			}
 
-			//check_map.clear();
+			check_map.clear();
 
 	}
 	
-		for (auto it = check_map.begin(); it != check_map.end(); it++)
-			{
 
-				if (it->second == false)
-				{
-					primes.push_back(it->first);
-				}
-
-
-			}
 
 	map<string, vector<int>> final_PI;
-	/*for (auto it = map_temp.begin(); it != map_temp.end(); it++)
-	{
-		for (auto x : it->second)
-		{
-			final_PI[x] = binary_rep_mins[x];
-
-		}
-
-	}*/
+	
 
 	
 	for (int i = 0; i < primes.size(); i++)
@@ -385,6 +368,7 @@ void bool_function::P_I()
 			cout << x << " " << ",";
 		cout << endl;
 	}
+
 	binary_rep_mins = final_PI;
 
 
