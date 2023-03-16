@@ -3,6 +3,7 @@
 #include<string>
 #include<vector>
 #include<map>
+#include<unordered_map>
 #include<iomanip>
 using namespace std;
 struct  ret_type    // this returns if the difference is 1 or not;
@@ -21,10 +22,11 @@ public:
 private: 
 	
 	map<string, vector<int>> binary_rep_mins; // key is the binary rep and the value is the minterm 
-	
+	map<int, bool> minterms;
 	string expression;  // to store the function expression as a whole after validation 
 	vector<char> literals; // to store function literals after validation. (will be used later) 
 	vector<vector<bool>> truth_table; 
+	unordered_map<string, vector<int>> EPIS;
 	map<char, int> lit; //literals with their index in truth table
 	int rows=0, size=0; // used to set size of the truth table and print it.  //size here is equal to the size of the colomns of truth table -1
 

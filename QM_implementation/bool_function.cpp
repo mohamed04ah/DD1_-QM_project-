@@ -16,6 +16,7 @@ bool_function::bool_function() {
 	output_table();
     print_table();
 	P_I();
+	EPI();
 	//canonical_sop();
 	//canonical_pos();
 	
@@ -203,6 +204,7 @@ void bool_function::P_I()
 		string temp_string = "";
 		if (truth_table[i][size] == 1)
 		{
+			minterms[i] = true;
 			for (int j = 0; j < size; j++)
 			{
 
@@ -376,11 +378,72 @@ void bool_function::P_I()
 }
 
 	
-void bool_function::EPI()
+
+
+void bool_function::EPI() 
 {
+	map <int, vector<string>>temp_map;
+	map<string,vector<int>> copy_EPIS;
+	for (auto it = binary_rep_mins.begin(); it != binary_rep_mins.end(); it++) //
+	{
+		for (auto x : it->second) 
+		{
+			temp_map[x].push_back(it->first);
+		}
+	}
 
+	for (auto it = temp_map.begin(); it != temp_map.end(); it++)
+	{
+		if (it->second.size() == 1)
+		{
+			EPIS[it->second[0]].push_back(it->first);
+		}
 
+	}
+
+	for (auto it = EPIS.begin(); it != EPIS.end(); it++)
+	{
+		string temp = "";
+		for (int i = 0; i < it->first.size(); i++) 
+		{
+			
+			if (it->first[i] == '1')
+			{
+				temp += literals[i];
+			}
+			else if (it->first[i] == '0') 
+			{
+				temp += literals[i];
+					temp+='`';
+			}
+		}
+		
+		
+		copy_EPIS[temp] = it->second;
+		
+	
+	}
+
+	cout << endl;
+	
+	
+	for (auto it =copy_EPIS.begin(); it != copy_EPIS.end(); it++) 
+	{
+		for (auto x : it->second) 
+		{
+			minterms[x] = false;
+		}
+	}
+
+	cout << "not covered" << endl;
+	for (auto it = minterms.begin(); it != minterms.end(); it++) {
+		if (it->second == true)
+			cout << it->first << " ";
+
+	}
 }
+
+
 
 
 void bool_function::canonical_pos() {// take the output of the function, the table of a,b,.., the literals
