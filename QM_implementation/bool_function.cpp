@@ -102,7 +102,7 @@ bool bool_function::validate()
 		}
 	}
 	expression = temp;
-	cout << "the expression" << " " << expression << endl;
+	
 	return flat;
 }
 void bool_function::gen_table()
@@ -204,8 +204,12 @@ void bool_function::canonical_sop() {// take the output of the function, the tab
 			sop_result += "+";//this adddition is added between the products
 		}
 	}
-	sop_result.pop_back(); //becasue there will be (+) added at the end of the expression so we remove it
-	cout << endl<<"The Canonical Sum of Products:  " << sop_result << endl;
+	if (!sop_result.empty()) {
+		sop_result.pop_back(); //becasue there will be (+) added at the end of the expression so we remove it
+		cout << endl << "The Canonical Sum of Products:  " << sop_result << endl;
+	}
+	else
+		cout << endl << "The Canonical Sum of Products does not exist" << endl;
 }
 
 void bool_function::canonical_pos() {// take the output of the function, the table of a,b,.., the literals
@@ -223,10 +227,16 @@ void bool_function::canonical_pos() {// take the output of the function, the tab
 				pos_result += "+"; //between the literals we add (+)
 			}
 		}
-		pos_result.pop_back(); // there will be additional (+) added at the end of every n literals added between prackets so we remove it
-		pos_result += ")";
+		if (!pos_result.empty()) {
+			pos_result.pop_back(); // there will be additional (+) added at the end of every n literals added between prackets so we remove it
+			pos_result += ")";
+		}
+		
 	}
-	cout << endl << "The Canonical Product of Sums: " << pos_result << endl;
+	if (!pos_result.empty())
+		cout << endl << "The Canonical Product of Sums: " << pos_result << endl;
+	else
+		cout << endl << "The Canonical product of Sums does not exist" << endl;
 }
 
 void bool_function::P_I()
