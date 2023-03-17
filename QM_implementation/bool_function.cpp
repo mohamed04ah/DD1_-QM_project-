@@ -15,10 +15,11 @@ bool_function::bool_function() {
 	gen_table();
 	output_table();
     print_table();
+	canonical_sop();
+	canonical_pos();
 	P_I();
 	EPI();
-	//canonical_sop();
-	//canonical_pos();
+	
 	
 }
 bool bool_function::validate() 
@@ -204,7 +205,28 @@ void bool_function::canonical_sop() {// take the output of the function, the tab
 		}
 	}
 	sop_result.pop_back(); //becasue there will be (+) added at the end of the expression so we remove it
-	cout << "The Canonical Sum of Products: " << sop_result << endl;
+	cout << endl<<"The Canonical Sum of Products:  " << sop_result << endl;
+}
+
+void bool_function::canonical_pos() {// take the output of the function, the table of a,b,.., the literals
+	string pos_result = "";
+	for (int i = 0; i < rows; i++) {
+		if (truth_table[i][size] == false) { //if the output of the function equal zero
+			pos_result += "(";   //put every n literals added between prackets
+			for (int j = 0; j < size; j++) { //will loop over the colomns (literals) and will see the value of each literal
+				if (truth_table[i][j] == true) { //if it is equal one then we put ' for representing (Not) in literals
+					pos_result += literals[j];
+					pos_result += "`";
+				}
+				else //otherwise we only add the literal to the expression
+					pos_result += literals[j];
+				pos_result += "+"; //between the literals we add (+)
+			}
+		}
+		pos_result.pop_back(); // there will be additional (+) added at the end of every n literals added between prackets so we remove it
+		pos_result += ")";
+	}
+	cout << endl << "The Canonical Product of Sums: " << pos_result << endl;
 }
 
 void bool_function::P_I()
@@ -306,7 +328,7 @@ void bool_function::P_I()
 		final_PI[primes[i]] = binary_rep_mins[primes[i]];  //key =binary rep of prime implicants. // value= the minterms covered. 
 
 	//printing the final prime implicants
-	cout << "==============Prime implicants===========" << endl;
+	cout << endl<<"==============Prime implicants===========" << endl;
 	for (auto it = final_PI.begin(); it != final_PI.end(); it++)
 	{
 		cout << it->first << " " << ":";
@@ -333,10 +355,10 @@ void bool_function::EPI()
 	for (auto it = temp_map.begin(); it != temp_map.end(); it++)
 	{
 		if (it->second.size() == 1)   // indicates that this minterms is only covered by 1 implicant (i.e the implicant is essential)
-			EPIS[it->second[0]] = binary_rep_mins[it->second[0]];
+			copy_EPIS[it->second[0]] = binary_rep_mins[it->second[0]];
 	}
 
-	for (auto it = EPIS.begin(); it != EPIS.end(); it++)
+	for (auto it = copy_EPIS.begin(); it != copy_EPIS.end(); it++)
 	{
 		string temp = "";
 		for (int i = 0; i < it->first.size(); i++)
@@ -352,57 +374,44 @@ void bool_function::EPI()
 				temp += '`';
 			}
 		}
-		copy_EPIS[temp] = it->second;
+		EPIS[temp] = it->second;
 	}
 	cout << endl;
 
-	for (auto it = copy_EPIS.begin(); it != copy_EPIS.end(); it++)
+	for (auto it = EPIS.begin(); it != EPIS.end(); it++)
 	{
 		for (auto x : it->second)
 			minterms[x] = false;
 	}
-
-	for (auto it = copy_EPIS.begin(); it != copy_EPIS.end(); it++)
+	cout << "=============ESSENTIAL PRIME IMPLICANTS ============" << endl;
+	for (auto it = EPIS.begin(); it != EPIS.end(); it++)
 	{
-		cout << it->first << " ";
+		cout << it->first << ": ";
 		for (auto x : it->second)
 			cout << x << "  ";
 		cout << endl;
 	}
-	cout << endl;
-	cout << "mintermd" << endl;
-	for (auto it = minterms.begin(); it != minterms.end(); it++) {
-		cout << it->first << " ";
-	}
-	cout << endl;
-	cout << "not covered" << endl;
-	for (auto it = minterms.begin(); it != minterms.end(); it++) {
-		if (it->second == true)
-			cout << it->first << " ";
-	}
-}
+	
 
-
-void bool_function::canonical_pos() {// take the output of the function, the table of a,b,.., the literals
-	string pos_result = "";
-	for (int i = 0; i < rows; i++) {
-		if (truth_table[i][size] == false) { //if the output of the function equal zero
-			pos_result += "(";   //put every n literals added between prackets
-			for (int j = 0; j < size; j++) { //will loop over the colomns (literals) and will see the value of each literal
-				if (truth_table[i][j] == true) { //if it is equal one then we put ' for representing (Not) in literals
-					pos_result += literals[j];
-					pos_result += "`";
-				}
-				else //otherwise we only add the literal to the expression
-					pos_result += literals[j];
-				pos_result += "+"; //between the literals we add (+)
-			}
+	
+	cout << "\nMinterms not covered by EPI'S :" << endl;
+	int counter = 0;
+	for (auto it = minterms.begin(); it != minterms.end(); it++)
+	{
+		if (it->second == true) {
+			cout << it->first << ", ";
+			counter++;
 		}
-		pos_result.pop_back(); // there will be additional (+) added at the end of every n literals added between prackets so we remove it
-		pos_result += ")";
+		
 	}
-	cout << "The Canonical Product of Sums: " << pos_result << endl;
+	if (counter == 0) 
+	{
+		cout << "All minterms are covered" << endl;
+	}
 }
+
+
+
 
 
 ret_type bool_function::compare_strings(string x, string y)
