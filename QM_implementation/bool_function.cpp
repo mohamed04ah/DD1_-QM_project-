@@ -6,7 +6,7 @@ bool_function::bool_function() {
 	res=validate();
 	while (res!= true) 
 	{
-		cout << "try again" << endl;
+		cout << "Try again" << endl;
 		literals.clear();
 		lit.clear();
 		res=validate();
@@ -29,37 +29,31 @@ bool bool_function::validate()
 	getline(cin, input);
 		for (int i = 0; i < input.size(); i++)
 		{
-			if (isalpha(input[i])) 
+			if (isalpha(input[i]))  //if it is literal
 			{
 				lit[input[i]] = 0;
 				flat = true;
-			
 			}
 			else if (input[i] == '+' && (i == 0 || i == input.size() - 1 || input[i - 1] == '+')) { //if '+' at the beginning or at the end or not between two literals
-				//cout << "error!" << endl << "try again" << endl;
 				flat = false;
 				break;
 			}
 			else if (input[i] == '`' && i == 0) { //'if '`' at the beginning
-			//	cout << "error!" << endl << "try again" << endl;
 				flat = false;
 				break;
 			}
-			else if (input[i] == '`' && input[i - 1] == '+' && i != 0) //--i is the major reason for the infinte loop, it decreases the i
-			{   //check if the +` come together in this way
-				cout << "Error: Invalid character '" << input[i] << "' found in input." << endl;
-				//cout << "try again" << endl;
+			else if (input[i] == '`' && input[i - 1] == '+' && i != 0)  //check if the + and ` come together after each other in this way
+			{ 
 				flat = false;
 				break;
 			}
 			else if (input[i] != '+' && input[i] != '`' && !isalpha(input[i])) //check if any other useless operator or number were put
 			{
 				cout << "Error: Invalid character '" << input[i] << "' found in input." << endl;
-			//	cout << "try again" << endl;
 				flat = false;
 				break;
 			}
-			else
+			else  //otherwise it is definitley true
 				flat = true;
 		}
 	
@@ -69,12 +63,12 @@ bool bool_function::validate()
 
 	int count = 0;
 	for (auto it = lit.begin(); it != lit.end(); it++) {
-		it->second = count++;  //this is to give every literal a number as it will appear in the truth table
+		it->second = count++;  //this is to give every literal an index as it will appear in the truth table (A->0, B->1 ,...)
 	}
 
 	for (auto it = lit.begin(); it != lit.end(); it++) 
 	{
-		literals.push_back(it->first);
+		literals.push_back(it->first);  
 	}
 	expression = input;
 	return flat;
@@ -103,50 +97,34 @@ void bool_function::gen_table()
 	truth_table = temp_table;
 }
 
-void bool_function::output_table() {
-	vector<bool> real_output; //contain the final output of the function
-	for (int i = 0; i < truth_table.size(); i++) { //looping over every row in the table
-		vector<bool> storing;  //will store the multiplies (like ab,cd)
-		bool result = true;
-		for (int j = 0; j < expression.size(); j++)
-		{ //looping over the expression (like ab+cd)
+void bool_function::output_table()
+{
+	for (int i = 0; i < rows; i++) //looping over every row in the table
+	{ 
+		bool result = true; //result will multiply the multipliers like abc until it find + 
+		for (int j = 0; j < expression.size(); j++) //looping over the expression (like a`b+cd)
+		{ 
 			char c = expression[j];
 			if (c == '`')
 				continue;
 			if (j == expression.size() - 1) {
-				result = result * truth_table[i][lit[c]];
+				result = result * truth_table[i][lit[c]];  //lit[c] will decide which colomn exactly has the value that we want
 				break;
 			}
-			if (c != '+' && expression[j + 1] != '`' && j != expression.size() - 1)//take care because there might be spaces between the characters in the expression 
+			if (c != '+' && expression[j + 1] != '`') 
 				result = result * truth_table[i][lit[c]];   //lit[c] this represents which colomn in the row i
-			else if (c != '+' && expression[j + 1] == '`' && j != expression.size() - 1) 
-			{
+			else if (c != '+' && expression[j + 1] == '`') 
 				result = result *!truth_table[i][lit[c]];
-			}
-			
 			else if (c == '+')
 			{
-				if (result == 1)
-				{
-					truth_table[i][size] = 1;
+				if (result == true) // break here becasue if it is true then the output is true because 1+ anything is true
 					break;
-				}
 				else
-				storing.push_back(result);
-				result = true;
+					result = true; //set it equal true to start a new multiplier after the + 
 			}
 		}
-		
-		storing.push_back(result); //because the final result will not be pushed back as there is no + at the end of the expression
-		bool sum = false; //this will add the multiplies in the storing vector
-		for (int i = 0; i < storing.size(); i++) {
-			sum = sum + storing[i];
-		}
-		real_output.push_back(sum);
+		truth_table[i][size] = result;  
 	}
-
-	for (int i = 0; i < rows; i++)
-		truth_table[i][size] = real_output[i];    // adds this output to the truth table. 
 }
 
 
@@ -194,47 +172,28 @@ void bool_function::canonical_sop() {// take the output of the function, the tab
 
 void bool_function::P_I()
 {
-	map<int, vector<string>> implication_table; // keys are number of 1s, value is the binary rep 
-	vector<string>primes;
-	int counter = 0;
+	map<int, vector<string>> implication_table; //key is the number of ones, values are vectors of binary representations having this number of ones
 	
 	for (int i = 0; i < rows; i++)
 	{
-
 		string temp_string = "";
+		int counter = 0;
 		if (truth_table[i][size] == 1)
 		{
 			minterms[i] = true;
 			for (int j = 0; j < size; j++)
 			{
-
 				if (truth_table[i][j] == 1)
 				{
 					temp_string += "1";
 					counter++;
 				}
 				else
-				{
 					temp_string += "0";
-				}
-
-
-
 			}
-			if (implication_table.find(counter) == implication_table.end())
-			{
-				//vector<string> temp;
-				//temp.push_back(temp_string);
-				implication_table[counter].push_back( temp_string);
-			}
-			else {
-				implication_table[counter].push_back(temp_string);
-			}
+			implication_table[counter].push_back(temp_string);
 			binary_rep_mins[temp_string].push_back(i);
 		}
-
-		counter = 0;
-		temp_string.clear();
 	}
 
 	/*for (auto it = implication_table.begin(); it != implication_table.end(); it++)
@@ -246,13 +205,12 @@ void bool_function::P_I()
 		cout << endl;
 	}*/
 	
-
 	cout << "====================================================" << endl;
-	map<int, vector<string>> map_temp;
-	map<string, bool> check_map;
+	map<int, vector<string>> map_temp;  //key is the number of ones, values are vectors of binary representations having this number of ones(0001,0101,...)
+	unordered_map<string, bool> check_map; //key is the binary representation, value is to chech if this binary get combined or not
+	vector<string>primes; //to store the prime implicants 
 	while (!implication_table.empty())
 	{
-		
 		map_temp = implication_table;
 		implication_table.clear();
 		/*for (auto it = map_temp.begin(); it != map_temp.end(); it++)
@@ -270,99 +228,63 @@ void bool_function::P_I()
 		{
 			for (auto it = map_temp.begin(); it != map_temp.end(); it++)
 			{
-				
 				for (auto x : it->second)
-				{
-				
 					check_map[x] = false;
-
-				}
 			}
 		}
-
 		else
-		{	
-			for (map<int, vector<string>> ::iterator it = map_temp.begin(); it != map_temp.end(); it++) 
+		{
+			for (auto it = map_temp.begin(); it != map_temp.end(); it++)
 			{
+				if (it == --map_temp.end())
+					break;
 
-			  if (it == --map_temp.end())
-			  {
-				break;
-			  }
+				vector <string> temp = (*it).second; // first group
 
-			  vector <string> temp = (*it).second; // first group
+				map<int, vector<string>> ::iterator it2;
+				it2 = ++it;
+				vector <string> temp_1 = (*it2).second;  // second group 
+				--it;
 
-			  map<int, vector<string>> ::iterator it2;
-			  it2 = ++it;
-			  vector <string> temp_1 = (*it2).second;  // second group 
-			  --it;
-
-
-			 
-			  for (int i = 0; i < temp.size(); i++)
-			  {
-
-				for (int j = 0; j < temp_1.size(); j++)
+				for (int i = 0; i < temp.size(); i++)
 				{
-					ret_type result;
-					result = compare_strings(temp[i], temp_1[j]);
-
-					if (result.diff)
+					for (int j = 0; j < temp_1.size(); j++)
 					{
-
-						check_map[temp[i]] = true;
-						check_map[temp_1[j]] = true;
-
-						binary_rep_mins[result.comb] = result.minterm_comb;
-						implication_table[result.num_of_1].push_back(result.comb);
+						ret_type result;
+						result = compare_strings(temp[i], temp_1[j]);
+						if (result.diff)
+						{
+							check_map[temp[i]] = true;
+							check_map[temp_1[j]] = true;
+							binary_rep_mins[result.comb] = result.minterm_comb;
+							implication_table[result.num_of_1].push_back(result.comb);
+						}
+						else
+						{
+							if (check_map[temp[i]] != true)
+								check_map[temp[i]] = false;
+							if (check_map[temp_1[j]] != true)
+								check_map[temp_1[j]] = false;
+						}
 					}
-					else
-					{
-						if (check_map[temp[i]] != true)
-							check_map[temp[i]] = false;
-						if (check_map[temp_1[j]] != true)
-							check_map[temp_1[j]] = false;
-					}
-
 				}
-			   }
-
-
-
 			}
-
-
 		}
 
-			
-		
-			
 			for (auto it = check_map.begin(); it != check_map.end(); it++)
 			{
-				
 				if (it->second == false)
-				{
 					primes.push_back(it->first);
-				}
-
-				
 			}
-
 			check_map.clear();
-
 	}
-	
 
-
-	map<string, vector<int>> final_PI;
-	
-
+	unordered_map<string, vector<int>> final_PI; //key is the binary representation(0-01,...) of prime implicants and values are minterms covered by them
 	
 	for (int i = 0; i < primes.size(); i++)
-	{
 		final_PI[primes[i]] = binary_rep_mins[primes[i]];
-	}
 
+	//printing the final prime implicants
 	for (auto it = final_PI.begin(); it != final_PI.end(); it++)
 	{
 		cout << it->first << " " << ":";
@@ -372,33 +294,24 @@ void bool_function::P_I()
 	}
 
 	binary_rep_mins = final_PI;
-
-
-
 }
 
 	
 
-
 void bool_function::EPI() 
 {
-	map <int, vector<string>>temp_map;
-	map<string,vector<int>> copy_EPIS;
-	for (auto it = binary_rep_mins.begin(); it != binary_rep_mins.end(); it++) //
+	unordered_map <int, vector<string>>temp_map;  //key is the minterm, value is a vector of binary representations covering this minterm
+	unordered_map<string,vector<int>> copy_EPIS;  //key is the EPIS in boolean expression(AD,BC,...), and value is the minterms covered by them 
+	for (auto it = binary_rep_mins.begin(); it != binary_rep_mins.end(); it++) 
 	{
-		for (auto x : it->second) 
-		{
+		for (auto x : it->second)
 			temp_map[x].push_back(it->first);
-		}
 	}
 
 	for (auto it = temp_map.begin(); it != temp_map.end(); it++)
 	{
 		if (it->second.size() == 1)
-		{
-			EPIS[it->second[0]].push_back(it->first);
-		}
-
+			EPIS[it->second[0]] = binary_rep_mins[it->second[0]];
 	}
 
 	for (auto it = EPIS.begin(); it != EPIS.end(); it++)
@@ -414,36 +327,25 @@ void bool_function::EPI()
 			else if (it->first[i] == '0') 
 			{
 				temp += literals[i];
-					temp+='`';
+				temp += '`';
 			}
 		}
-		
-		
 		copy_EPIS[temp] = it->second;
-		
-	
 	}
-
 	cout << endl;
-	
 	
 	for (auto it =copy_EPIS.begin(); it != copy_EPIS.end(); it++) 
 	{
-		for (auto x : it->second) 
-		{
+		for (auto x : it->second)
 			minterms[x] = false;
-		}
 	}
 
 	cout << "not covered" << endl;
 	for (auto it = minterms.begin(); it != minterms.end(); it++) {
 		if (it->second == true)
 			cout << it->first << " ";
-
 	}
 }
-
-
 
 
 void bool_function::canonical_pos() {// take the output of the function, the table of a,b,.., the literals
@@ -470,11 +372,8 @@ void bool_function::canonical_pos() {// take the output of the function, the tab
 
 ret_type bool_function::compare_strings(string x, string y)
 {
-
 	int counter = 0;
-
 	ret_type value;
-
 	value.num_of_1 = 0;
 	string temp;
 	int pos = -1;
@@ -501,24 +400,15 @@ ret_type bool_function::compare_strings(string x, string y)
 	}
 
 	for (auto it : binary_rep_mins[x])
-	{
-
 		value.minterm_comb.push_back(it);
-	}
 
-	for (auto it : binary_rep_mins[y]) {
-
+	for (auto it : binary_rep_mins[y])
 		value.minterm_comb.push_back(it);
-	}
 
 	for (int i = 0; i < temp.size(); i++)
 	{
 		if (temp[i] == '1')
 			value.num_of_1++;
 	}
-
-	
 	return value;
-
-
 }
