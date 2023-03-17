@@ -398,7 +398,7 @@ void bool_function::EPI()
 	{
 		cout << it->first << ": ";
 		for (auto x : it->second)
-			cout << x << "  ";
+			cout << x << " , ";
 		cout << endl;
 	}
 	
