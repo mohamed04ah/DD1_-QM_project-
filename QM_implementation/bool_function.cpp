@@ -6,7 +6,7 @@ bool_function::bool_function() {
 	res=validate();
 	while (res!= true) 
 	{
-		cout << "Try again" << endl;
+		cout << "Invalid boolean expression! Try again." << endl;
 		literals.clear();
 		lit.clear();
 		res=validate();
@@ -71,6 +71,37 @@ bool bool_function::validate()
 		literals.push_back(it->first);  
 	}
 	expression = input;
+	string temp = "";
+	for (int i = 0; i < expression.size(); i++)
+	{
+		
+		if (expression[i] == '`' )
+		{
+			
+			int counter = 1;
+			int j = i + 1;
+			while (expression[j] == '`' && j < expression.size())
+			{
+				counter++;
+				j++;
+			}
+			
+			if (counter % 2 != 0) 
+			{
+				
+				temp += '`';
+				
+			}
+			
+			i = j-1;
+			
+		}
+		else {
+			temp += expression[i];
+		}
+	}
+	expression = temp;
+	cout << "the expression" << " " << expression << endl;
 	return flat;
 }
 void bool_function::gen_table()
@@ -85,9 +116,9 @@ void bool_function::gen_table()
 		for (int j = 0; j < rows; j++)  //for the rows of each column
 		{
 			
-			if ((j/flip)%2==0)
-			{
-				temp_table[j][i] = false;
+			if ((j/flip)%2==0)    // this is to identify the boolean of the rows in the column. 
+			{                        
+				temp_table[j][i] = false;  
 			}
 			else
 				temp_table[j][i] = true; 
@@ -102,6 +133,7 @@ void bool_function::output_table()
 	for (int i = 0; i < rows; i++) //looping over every row in the table
 	{ 
 		bool result = true; //result will multiply the multipliers like abc until it find + 
+
 		for (int j = 0; j < expression.size(); j++) //looping over the expression (like a`b+cd)
 		{ 
 			char c = expression[j];
@@ -111,10 +143,13 @@ void bool_function::output_table()
 				result = result * truth_table[i][lit[c]];  //lit[c] will decide which colomn exactly has the value that we want
 				break;
 			}
+
 			if (c != '+' && expression[j + 1] != '`') 
 				result = result * truth_table[i][lit[c]];   //lit[c] this represents which colomn in the row i
+
 			else if (c != '+' && expression[j + 1] == '`') 
 				result = result *!truth_table[i][lit[c]];
+
 			else if (c == '+')
 			{
 				if (result == true) // break here becasue if it is true then the output is true because 1+ anything is true
@@ -123,6 +158,7 @@ void bool_function::output_table()
 					result = true; //set it equal true to start a new multiplier after the + 
 			}
 		}
+
 		truth_table[i][size] = result;  
 	}
 }
@@ -130,9 +166,10 @@ void bool_function::output_table()
 
 void bool_function::print_table()
 {
+	cout << setw(7);
 	for (int i = 0; i < size; i++)
 	{
-		cout << setw(3)<<literals[i] << setw(3);
+		cout << literals[i] << setw(3);
 	}
 	cout << "F";
 	cout << endl;
@@ -142,10 +179,10 @@ void bool_function::print_table()
 	cout << endl;
 	for (int i = 0; i < rows; i++)
 	{
-		cout << i << " : ";
-		for (int j = 0; j < size+1; j++)
+		cout << setw(3) << i << ":";
+		for (int j = 0; j < size + 1; j++)
 		{
-			cout <<setw(3)<< truth_table[i][j] << setw(3);
+			cout << setw(3) << truth_table[i][j] << setw(3);
 		}
 		cout << endl;
 	}
@@ -180,7 +217,7 @@ void bool_function::P_I()
 		int counter = 0;
 		if (truth_table[i][size] == 1)
 		{
-			minterms[i] = true;
+			minterms[i] = true; 
 			for (int j = 0; j < size; j++)
 			{
 				if (truth_table[i][j] == 1)
@@ -196,16 +233,9 @@ void bool_function::P_I()
 		}
 	}
 
-	/*for (auto it = implication_table.begin(); it != implication_table.end(); it++)
-	{
-		cout << it->first << " :";
-
-		for (auto x : it->second)
-			cout << x << " ";
-		cout << endl;
-	}*/
+	// this ends the grouping of the first stage
 	
-	cout << "====================================================" << endl;
+
 	map<int, vector<string>> map_temp;  //key is the number of ones, values are vectors of binary representations having this number of ones(0001,0101,...)
 	unordered_map<string, bool> check_map; //key is the binary representation, value is to chech if this binary get combined or not
 	vector<string>primes; //to store the prime implicants 
@@ -213,56 +243,47 @@ void bool_function::P_I()
 	{
 		map_temp = implication_table;
 		implication_table.clear();
-		/*for (auto it = map_temp.begin(); it != map_temp.end(); it++)
-		{
-			cout << it->first << " ; ";
-			for (auto x : it->second)
-			{
-
-				cout << x << " ";
-			}
-			cout << endl;
-		}*/
 		
-		if (map_temp.size()==1)
+		
+		if (map_temp.size()==1)   // only 1 group in the implication table. 
 		{
 			for (auto it = map_temp.begin(); it != map_temp.end(); it++)
 			{
 				for (auto x : it->second)
-					check_map[x] = false;
+					check_map[x] = false;  // this indicates that this implicant is prime. 
 			}
 		}
 		else
 		{
 			for (auto it = map_temp.begin(); it != map_temp.end(); it++)
 			{
-				if (it == --map_temp.end())
+				if (it == --map_temp.end())   // to avoid out of bound error. 
 					break;
 
-				vector <string> temp = (*it).second; // first group
+				vector <string> temp = (*it).second; // first group to be compared
 
 				map<int, vector<string>> ::iterator it2;
 				it2 = ++it;
-				vector <string> temp_1 = (*it2).second;  // second group 
+				vector <string> temp_1 = (*it2).second;  // second group to be compared 
 				--it;
 
 				for (int i = 0; i < temp.size(); i++)
-				{
+				{                                                      // nested loops compare each string in the 2 groups. 
 					for (int j = 0; j < temp_1.size(); j++)
 					{
 						ret_type result;
 						result = compare_strings(temp[i], temp_1[j]);
-						if (result.diff)
+						if (result.diff) // combination occured
 						{
-							check_map[temp[i]] = true;
-							check_map[temp_1[j]] = true;
-							binary_rep_mins[result.comb] = result.minterm_comb;
-							implication_table[result.num_of_1].push_back(result.comb);
+							check_map[temp[i]] = true;  // not prime
+							check_map[temp_1[j]] = true; // not prime
+							binary_rep_mins[result.comb] = result.minterm_comb;   // binary representaion of the combined minterms, and the minterms covered by both minterms 
+							implication_table[result.num_of_1].push_back(result.comb);  // forms a new group. 
 						}
 						else
 						{
 							if (check_map[temp[i]] != true)
-								check_map[temp[i]] = false;
+								check_map[temp[i]] = false;  // this indicates its a prime implicant
 							if (check_map[temp_1[j]] != true)
 								check_map[temp_1[j]] = false;
 						}
@@ -274,7 +295,7 @@ void bool_function::P_I()
 			for (auto it = check_map.begin(); it != check_map.end(); it++)
 			{
 				if (it->second == false)
-					primes.push_back(it->first);
+					primes.push_back(it->first);  // if the minterms were not combined, add to the primes vector
 			}
 			check_map.clear();
 	}
@@ -282,9 +303,10 @@ void bool_function::P_I()
 	unordered_map<string, vector<int>> final_PI; //key is the binary representation(0-01,...) of prime implicants and values are minterms covered by them
 	
 	for (int i = 0; i < primes.size(); i++)
-		final_PI[primes[i]] = binary_rep_mins[primes[i]];
+		final_PI[primes[i]] = binary_rep_mins[primes[i]];  //key =binary rep of prime implicants. // value= the minterms covered. 
 
 	//printing the final prime implicants
+	cout << "==============Prime implicants===========" << endl;
 	for (auto it = final_PI.begin(); it != final_PI.end(); it++)
 	{
 		cout << it->first << " " << ":";
@@ -298,33 +320,33 @@ void bool_function::P_I()
 
 	
 
-void bool_function::EPI() 
+void bool_function::EPI()
 {
 	unordered_map <int, vector<string>>temp_map;  //key is the minterm, value is a vector of binary representations covering this minterm
-	unordered_map<string,vector<int>> copy_EPIS;  //key is the EPIS in boolean expression(AD,BC,...), and value is the minterms covered by them 
-	for (auto it = binary_rep_mins.begin(); it != binary_rep_mins.end(); it++) 
-	{
+	unordered_map<string, vector<int>> copy_EPIS;  //key is the EPIS in boolean expression(AD,BC,...), and value is the minterms covered by them 
+	for (auto it = binary_rep_mins.begin(); it != binary_rep_mins.end(); it++)
+	{                                                                           // loop over prime implicants and push them into the temp map 
 		for (auto x : it->second)
 			temp_map[x].push_back(it->first);
 	}
 
 	for (auto it = temp_map.begin(); it != temp_map.end(); it++)
 	{
-		if (it->second.size() == 1)
+		if (it->second.size() == 1)   // indicates that this minterms is only covered by 1 implicant (i.e the implicant is essential)
 			EPIS[it->second[0]] = binary_rep_mins[it->second[0]];
 	}
 
 	for (auto it = EPIS.begin(); it != EPIS.end(); it++)
 	{
 		string temp = "";
-		for (int i = 0; i < it->first.size(); i++) 
+		for (int i = 0; i < it->first.size(); i++)
 		{
-			
+
 			if (it->first[i] == '1')
 			{
 				temp += literals[i];
 			}
-			else if (it->first[i] == '0') 
+			else if (it->first[i] == '0')
 			{
 				temp += literals[i];
 				temp += '`';
@@ -333,13 +355,26 @@ void bool_function::EPI()
 		copy_EPIS[temp] = it->second;
 	}
 	cout << endl;
-	
-	for (auto it =copy_EPIS.begin(); it != copy_EPIS.end(); it++) 
+
+	for (auto it = copy_EPIS.begin(); it != copy_EPIS.end(); it++)
 	{
 		for (auto x : it->second)
 			minterms[x] = false;
 	}
 
+	for (auto it = copy_EPIS.begin(); it != copy_EPIS.end(); it++)
+	{
+		cout << it->first << " ";
+		for (auto x : it->second)
+			cout << x << "  ";
+		cout << endl;
+	}
+	cout << endl;
+	cout << "mintermd" << endl;
+	for (auto it = minterms.begin(); it != minterms.end(); it++) {
+		cout << it->first << " ";
+	}
+	cout << endl;
 	cout << "not covered" << endl;
 	for (auto it = minterms.begin(); it != minterms.end(); it++) {
 		if (it->second == true)
