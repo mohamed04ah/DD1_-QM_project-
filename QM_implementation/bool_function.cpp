@@ -39,7 +39,7 @@ bool_function::bool_function()
 				cout << "==================================END OF TEST CASE================================" << endl;
 				literals.clear();
 				lit.clear();
-				temp_map.clear();
+				 temp_map.clear();
 				copy_EPIS.clear();
 
 		}
