@@ -11,7 +11,7 @@ bool_function::bool_function()
 	case 1:
 	{
 
-		vector<string> test_cases = { "`b+cd","abc++e","ab+`e","bca+z","abc`+ed`","a``b+s``e","abcde+fg`h","abcde+fghij","aa`+cd","b`c`d`+a`b`d+bcd+abd`"
+		vector<string> test_cases = { "`b+cd","abc++e","ab+`e","bca+z","abc`+ed`","a``b+s``e","abcde+fgh","abcde+fghij","aa`+cd","b`c`d`+a`b`d+bcd+abd`"
 
 		};
 		int counter = 1;
@@ -31,7 +31,7 @@ bool_function::bool_function()
 				canonical_pos();
 				P_I();
 				EPI();
-				Minimized_boolean();
+				//Minimized_boolean();
 				
 			}
 
@@ -39,6 +39,8 @@ bool_function::bool_function()
 				cout << "==================================END OF TEST CASE================================" << endl;
 				literals.clear();
 				lit.clear();
+				temp_map.clear();
+				copy_EPIS.clear();
 
 		}
 	
@@ -53,7 +55,8 @@ bool_function::bool_function()
 				cout << "Invalid boolean expression! Try again." << endl;
 				literals.clear();
 				lit.clear();
-				
+				temp_map.clear();
+				copy_EPIS.clear();
 			}
 		
 		
@@ -65,7 +68,7 @@ bool_function::bool_function()
 			canonical_pos();
 			P_I();
 			EPI();
-			Minimized_boolean();
+			//Minimized_boolean();
 	}
 	break;
 	case 3:
@@ -572,68 +575,68 @@ void bool_function::EPI()
 }
 
 
-void bool_function::Minimized_boolean()
-{
-	string minimized = "";
-	auto it2 = EPIS.begin();
-	for (auto it = copy_EPIS.begin(); it != copy_EPIS.end(); it++)
-	{
-		minimized += it2->first;
-		minimized += '+';
-		it2++;
-		binary_rep_mins.erase(it->first);
-		for (auto x : it->second)
-			temp_map.erase(x);
-	}
-	while (!temp_map.empty())
-	{
-		int key = 0, size = 0;
-
-		for (auto it = temp_map.begin(); it != temp_map.end(); it++) //to remove the dominating colomn
-		{
-			if (it->second.size() > size) {
-				size = it->second.size();
-				key = it->first;
-			}
-		}
-		temp_map.erase(key);
-		int size_row = 0;
-		string key_row = "";
-		for (auto it = binary_rep_mins.begin(); it != binary_rep_mins.end(); it++)
-		{
-			if (it->second.size() > size)
-			{
-				size = it->second.size();
-				key_row = it->first;
-			}
-		}
-		string temp = "";
-		for (int i = 0; i < key_row.size(); i++)
-		{
-			if (key_row[i] == '1')
-			{
-				temp += literals[i];
-			}
-			else if (key_row[i] == '0')
-			{
-				temp += literals[i];
-				temp += '`';
-			}
-		}
-		minimized += temp;
-		minimized += '+';
-		for (auto x : binary_rep_mins[key_row]) {
-			temp_map.erase(x);
-		}
-
-	}
-	if (!minimized.empty()) {
-		while (minimized[minimized.size() - 1] == '+')
-			minimized.pop_back();
-	}
-	cout << "\nThe minimized expression is: " << minimized << endl;
-
-}
+//void bool_function::Minimized_boolean()
+//{
+//	string minimized = "";
+//	auto it2 = EPIS.begin();
+//	for (auto it = copy_EPIS.begin(); it != copy_EPIS.end(); it++)
+//	{
+//		minimized += it2->first;
+//		minimized += '+';
+//		it2++;
+//		binary_rep_mins.erase(it->first);
+//		for (auto x : it->second)
+//			temp_map.erase(x);
+//	}
+//	while (!temp_map.empty())
+//	{
+//		int key = 0, size = 0;
+//
+//		for (auto it = temp_map.begin(); it != temp_map.end(); it++) //to remove the dominating colomn
+//		{
+//			if (it->second.size() > size) {
+//				size = it->second.size();
+//				key = it->first;
+//			}
+//		}
+//		temp_map.erase(key);
+//		int size_row = 0;
+//		string key_row = "";
+//		for (auto it = binary_rep_mins.begin(); it != binary_rep_mins.end(); it++)
+//		{
+//			if (it->second.size() > size)
+//			{
+//				size = it->second.size();
+//				key_row = it->first;
+//			}
+//		}
+//		string temp = "";
+//		for (int i = 0; i < key_row.size(); i++)
+//		{
+//			if (key_row[i] == '1')
+//			{
+//				temp += literals[i];
+//			}
+//			else if (key_row[i] == '0')
+//			{
+//				temp += literals[i];
+//				temp += '`';
+//			}
+//		}
+//		minimized += temp;
+//		minimized += '+';
+//		for (auto x : binary_rep_mins[key_row]) {
+//			temp_map.erase(x);
+//		}
+//
+//	}
+//	if (!minimized.empty()) {
+//		while (minimized[minimized.size() - 1] == '+')
+//			minimized.pop_back();
+//	}
+//	cout << "\nThe minimized expression is: " << minimized << endl;
+//
+//}
 
 
 ret_type bool_function::compare_strings(string x, string y)
