@@ -73,8 +73,8 @@ Finally, we call the function that will generate the essential prime implicants 
 
 contributions : 
 
-Mohamed : created the truth table generation and printing functions
-Andrew: created the POS,SOP,truth table output functions. 
+Mohamed : created the truth table generation and printing functions, 
+ Andrew: created the POS,SOP,truth table output functions. 
 Raef: Validation (with additions from Mohamed and Andrew).
 
 Mohamed, Andrew, Raef:  EPI,PI functions.
