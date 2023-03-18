@@ -3,8 +3,7 @@
 
 int main()
 {
-	bool_function expre;
-
-
+	bool_function expression;
+	return 0;
 }
 

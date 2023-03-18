@@ -26,6 +26,8 @@ private:
 	string expression;  // to store the function expression as a whole after validation 
 	vector<char> literals; // to store function literals after validation.
 	vector<vector<bool>> truth_table; 
+	unordered_map <int, vector<string>>temp_map;  //key is the minterm, value is a vector of binary representations covering this minterm
+	unordered_map<string, vector<int>> copy_EPIS;  //key is the EPIS in boolean expression(AD,BC,...), and value is the minterms covered by them 
 	unordered_map<string, vector<int>> EPIS; //key is the binary representation of EPI and values are minterms covered by it
 	map<char, int> lit; //key is literal (A,B,...) and value is their index in truth table
 	int rows=0, size=0; //used to set size of the truth table and print it. Size here is equal to the size of the colomns of truth table -1
@@ -40,6 +42,7 @@ private:
 	void canonical_sop(); // extract sop form from truth table 
 	void P_I();   // identify prime implicants 
 	void EPI(); // identify essential prime implicants
+	void Minimized_boolean();
 	ret_type compare_strings(string x, string y);  // x and y are the binary representations(0001,-001,1-1-,...)
 	
 

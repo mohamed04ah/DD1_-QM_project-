@@ -31,7 +31,7 @@ bool_function::bool_function()
 				canonical_pos();
 				P_I();
 				EPI();
-			
+				Minimized_boolean();
 				
 			}
 
@@ -65,7 +65,7 @@ bool_function::bool_function()
 			canonical_pos();
 			P_I();
 			EPI();
-		
+			Minimized_boolean();
 	}
 	break;
 	case 3:
@@ -507,8 +507,6 @@ void bool_function::P_I()
 
 void bool_function::EPI()
 {
-	unordered_map <int, vector<string>>temp_map;  //key is the minterm, value is a vector of binary representations covering this minterm
-	unordered_map<string, vector<int>> copy_EPIS;  //key is the EPIS in boolean expression(AD,BC,...), and value is the minterms covered by them 
 	for (auto it = binary_rep_mins.begin(); it != binary_rep_mins.end(); it++)
 	{                                                                           // loop over prime implicants and push them into the temp map 
 		for (auto x : it->second)
@@ -574,7 +572,68 @@ void bool_function::EPI()
 }
 
 
+void bool_function::Minimized_boolean()
+{
+	string minimized = "";
+	auto it2 = EPIS.begin();
+	for (auto it = copy_EPIS.begin(); it != copy_EPIS.end(); it++)
+	{
+		minimized += it2->first;
+		minimized += '+';
+		it2++;
+		binary_rep_mins.erase(it->first);
+		for (auto x : it->second)
+			temp_map.erase(x);
+	}
+	while (!temp_map.empty())
+	{
+		int key = 0, size = 0;
 
+		for (auto it = temp_map.begin(); it != temp_map.end(); it++) //to remove the dominating colomn
+		{
+			if (it->second.size() > size) {
+				size = it->second.size();
+				key = it->first;
+			}
+		}
+		temp_map.erase(key);
+		int size_row = 0;
+		string key_row = "";
+		for (auto it = binary_rep_mins.begin(); it != binary_rep_mins.end(); it++)
+		{
+			if (it->second.size() > size)
+			{
+				size = it->second.size();
+				key_row = it->first;
+			}
+		}
+		string temp = "";
+		for (int i = 0; i < key_row.size(); i++)
+		{
+			if (key_row[i] == '1')
+			{
+				temp += literals[i];
+			}
+			else if (key_row[i] == '0')
+			{
+				temp += literals[i];
+				temp += '`';
+			}
+		}
+		minimized += temp;
+		minimized += '+';
+		for (auto x : binary_rep_mins[key_row]) {
+			temp_map.erase(x);
+		}
+
+	}
+	if (!minimized.empty()) {
+		while (minimized[minimized.size() - 1] == '+')
+			minimized.pop_back();
+	}
+	cout << "\nThe minimized expression is: " << minimized << endl;
+
+}
 
 
 ret_type bool_function::compare_strings(string x, string y)
