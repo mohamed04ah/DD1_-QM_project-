@@ -32,6 +32,7 @@ private:
 	                    //rows equal number of rows
 	
 	bool validate(); // validate the entered function 
+	bool validate_1(string input);        // same implementation of  normal validate function above but is slightly modified to run test cases automatically. 
 	void gen_table(); // to generate the truth table. (truth table will be stored in a 2d vector)
 	void output_table();//to calculate the output of the truth table
 	void print_table(); // to print the truth table 

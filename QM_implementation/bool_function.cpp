@@ -1,32 +1,99 @@
 #include "bool_function.h"
 
-bool_function::bool_function() {
+bool_function::bool_function()
+{
+	int choice;
 
-	bool res;
-	res=validate();
-	while (res!= true) 
+	cout << "welcome. how would you like to run the program:" << endl << "1.run test cases" << endl << "2.enter input" << endl << "3.exit" << endl;
+	cin >> choice;
+	switch (choice)
 	{
-		cout << "Invalid boolean expression! Try again." << endl;
-		literals.clear();
-		lit.clear();
-		res=validate();
+	case 1:
+	{
+
+		vector<string> test_cases = { "`b+cd","abc++e","ab+`e","bca+z","abc`+ed`","a``b+s``e","abcde+fg`h","abcde+fghij","aa`+cd","b`c`d`+a`b`d+bcd+abd`"
+
+		};
+		int counter = 1;
+		for (int i = 0; i < test_cases.size(); i++)
+		{
+			bool res = false;
+			cout << "test case " << counter++ << " :" << endl;
+			cout << "function entered = " << test_cases[i] << endl;
+			res = validate_1(test_cases[i]);
+			if (res==true)
+			{
+				cout << "valid function entered" << endl;
+				gen_table();
+				output_table();
+				print_table();
+				canonical_sop();
+				canonical_pos();
+				P_I();
+				EPI();
+			
+				
+			}
+
+			
+				cout << "==================================END OF TEST CASE================================" << endl;
+				literals.clear();
+				lit.clear();
+
+		}
+	
 	}
-	cout << "valid function entered" << endl;
-	gen_table();
-	output_table();
-    print_table();
-	canonical_sop();
-	canonical_pos();
-	P_I();
-	EPI();
+	break;
+	case 2:
+	{
+		
+		
+			while (!validate()) 
+			{
+				cout << "Invalid boolean expression! Try again." << endl;
+				literals.clear();
+				lit.clear();
+				
+			}
+		
+		
+			cout << "valid function entered" << endl;
+			gen_table();
+			output_table();
+			print_table();
+			canonical_sop();
+			canonical_pos();
+			P_I();
+			EPI();
+		
+	}
+	break;
+	case 3:
+		exit(1);
+		break;
+	default:
+		exit(2);
+
+	}
+
+
+
+
+	
 	
 	
 }
 bool bool_function::validate() 
 {
+	static int  counter = 1;
 	bool flat = false;
 	string input;
 	cout << "enter your function" << endl;
+	if (counter == 1) {
+		cin.ignore(1, '\n');
+		counter++;
+	}
+
 	getline(cin, input);
 		for (int i = 0; i < input.size(); i++)
 		{
@@ -103,6 +170,90 @@ bool bool_function::validate()
 	}
 	expression = temp;
 	
+	return flat;
+}
+bool bool_function::validate_1(string input)
+{
+	bool flat = false;
+	
+	for (int i = 0; i < input.size(); i++)
+	{
+		if (isalpha(input[i]))  //if it is literal
+		{
+			lit[input[i]] = 0;
+			flat = true;
+		}
+		else if (input[i] == '+' && (i == 0 || i == input.size() - 1 || input[i - 1] == '+')) { //if '+' at the beginning or at the end or not between two literals
+			cout << "invalid function!" << endl;
+			flat = false;
+			break;
+		}
+		else if (input[i] == '`' && i == 0) { //'if '`' at the beginning
+			cout << "invalid function!" << endl;
+			flat = false;
+			break;
+		}
+		else if (input[i] == '`' && input[i - 1] == '+' && i != 0)  //check if the + and ` come together after each other in this way
+		{
+			cout << "invalid function!" << endl;
+			flat = false;
+			break;
+		}
+		else if (input[i] != '+' && input[i] != '`' && !isalpha(input[i])) //check if any other useless operator or number were put
+		{
+			cout << "Error: Invalid character '" << input[i] << "' found in input." << endl;
+			flat = false;
+			break;
+		}
+		else  //otherwise it is definitley true
+			flat = true;
+	}
+
+	if (flat == false) {
+		return flat;
+	}
+
+	int count = 0;
+	for (auto it = lit.begin(); it != lit.end(); it++) {
+		it->second = count++;  //this is to give every literal an index as it will appear in the truth table (A->0, B->1 ,...)
+	}
+
+	for (auto it = lit.begin(); it != lit.end(); it++)
+	{
+		literals.push_back(it->first);
+	}
+	expression = input;
+	string temp = "";
+	for (int i = 0; i < expression.size(); i++)
+	{
+
+		if (expression[i] == '`')
+		{
+
+			int counter = 1;
+			int j = i + 1;
+			while (expression[j] == '`' && j < expression.size())
+			{
+				counter++;
+				j++;
+			}
+
+			if (counter % 2 != 0)
+			{
+
+				temp += '`';
+
+			}
+
+			i = j - 1;
+
+		}
+		else {
+			temp += expression[i];
+		}
+	}
+	expression = temp;
+
 	return flat;
 }
 void bool_function::gen_table()
@@ -349,6 +500,8 @@ void bool_function::P_I()
 
 	binary_rep_mins = final_PI;
 }
+
+
 
 	
 
